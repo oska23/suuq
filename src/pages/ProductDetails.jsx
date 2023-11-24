@@ -1,21 +1,48 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
-import { StarIcon } from '@heroicons/react/20/solid'
-import { RadioGroup } from '@headlessui/react'
-import demoProducts from '../database/demoProducts.json';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase'; // Import your firebase configuration
 import { Link } from 'react-router-dom';
-import { Image } from 'antd';
+import { Image, Carousel } from 'antd';
+import { useAuth } from '../context/AuthContext.js';
+
 
 
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const [product, setProduct] = useState(demoProducts[id - 1]);
+  const [productDetails, setProductDetails] = useState([]);
+
+  const { user, HandleLogout } = useAuth();
+
+  
+
+
+
+  // Filtering similar products
+  // const similarProducts = demoProducts.filter(p => 
+  //   p.category === product.category && p.id !== product.id
+  // );
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const docRef = doc(db, "products", id);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setProductDetails({ id: docSnap.id, ...docSnap.data() });
+      } else {
+        console.log("No such document!");
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
 
   return (
     <div className="bg-white">
       <div className="max-w-7xl  mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        
+
         <div className="mb-4">
           <Link to="/">
             <button className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded">
@@ -30,7 +57,7 @@ const ProductDetails = () => {
         </div>
         <div className="lg:grid p-2 bg-green-400 lg:grid-cols-2 lg:gap-x-8 lg:items-start">
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            {product.name}
+            {productDetails?.name}
           </h1>
         </div>
         <div className="mt-8 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
@@ -71,17 +98,22 @@ const ProductDetails = () => {
             <div className="relative mx-auto rounded-lg shadow-lg md:max-w-2xl sm:mx-auto lg:max-w-full">
               <Image
                 width={`100%`}
-                src={product.image}
-                alt={product.name}
+                src={productDetails?.image}
+                alt={productDetails?.name}
               />
             </div>
           </div>
           <div className="mt-10 lg:mt-0">
             <div className="mt-4">
               <h2 className="">Product information</h2>
-              <p className="text-3xl text-gray-900">$ {product.price}</p>
-              <p className="mt-6 text-gray-500">{product.description}</p>
+              <p className="text-3xl text-gray-900">$ {productDetails?.price}</p>
+              <p className="mt-6 text-gray-500">{productDetails?.description}</p>
             </div>
+            <div className="mt-10">
+              <h2 className="text-sm font-bold text-gray-900 ">Location </h2>
+              <p className="mt-4 text-gray-500">{productDetails?.location}</p>
+            </div>
+            
             <div className="mt-10 rounded-md bg-green-300 p-4">
               <h2 className="text-sm font-bold text-gray-900 ">Safety Tips</h2>
               <ul className="mt-4 pl-4 list-disc text-sm space-y-2">
@@ -98,15 +130,90 @@ const ProductDetails = () => {
             </div>
             <div className="mt-10">
 
-              <button 
-              onClick={() => alert("Functionality not implemented yet! GG")}
+              {productDetails?.owner === user?.uid && productDetails?.status !== "sold" && (
+               <button
+               onClick={() => alert("Functionality not implemented yet! GG")}
+               className="bg-red-500 hover:bg-red-700 text-white w-full py-2 px-4 rounded">
+               Mark as Sold
+             </button>
+              )}
+
+              {productDetails?.owner === user?.uid && productDetails?.status === "sold" && (
+                <button
+                onClick={() => alert("Functionality not implemented yet! GG")}
+                className="bg-orange-500 hover:bg-orange-700 text-white w-full py-2 px-4 rounded">
+                Mark as Available
+              </button>
+              )}
+
+              {productDetails?.owner !== user?.uid && (
+                <button
+                onClick={() => window.open(`https://api.whatsapp.com/send?phone=252${productDetails?.contact}&text=Hi, I'm interested in your ${productDetails?.name} on Suuq.com. Is it still available?`, "_blank")}
                 className="bg-green-500 hover:bg-green-700 text-white w-full py-2 px-4 rounded">
                 Contact Seller
               </button>
+              )}
 
             </div>
           </div>
+          
         </div>
+
+        <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 mt-16">More Images</h2>
+        <div className="mt-4">
+
+
+
+
+        <Image.PreviewGroup>
+                {productDetails?.image?.map((image) => (
+                  <Image
+                    width={`20vw`}
+                    height={`20vw`}
+                    style={{
+                      objectFit: "cover",
+                    }}
+                    src={image}
+                  />
+                ))}
+        </Image.PreviewGroup>
+
+
+
+        </div>
+
+
+        
+        {/* <div className="mt-16">
+          <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">Similar Products</h2>
+          <p className="mt-4 text-gray-500">Other products you might be interested in.</p>
+
+          
+          <div className="mt-10 space-y-12 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-x-8">
+            
+           
+          {similarProducts.map((similarProduct) => (
+              <div key={product.id}>
+                <div className="aspect-w-3 aspect-h-4 rounded-lg overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.imageAlt}
+                    className="object-center object-cover"
+                  />
+                </div>
+                <div className="mt-4 flex items-center justify-between text-base font-medium text-gray-900">
+                  <h3>{product.name}</h3>
+                  <p>${product.price}</p>
+                </div>
+                <p className="mt-1 text-sm text-gray-500">{product.description}</p>
+              </div>
+            ))}
+          
+            </div>
+            
+            
+
+          </div> */}
       </div>
     </div>
 

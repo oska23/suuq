@@ -1,5 +1,6 @@
 import { Fragment, useState } from 'react'
 import { Dialog, Disclosure, Popover, Transition } from '@headlessui/react'
+import { Link } from 'react-router-dom'
 import {
   ArrowPathIcon,
   Bars3Icon,
@@ -10,6 +11,9 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
+
+import { useAuth } from '../context/AuthContext';
+
 
 const products = [
   { name: 'Analytics', description: 'Get a better understanding of your traffic', href: '#', icon: ChartPieIcon },
@@ -30,6 +34,19 @@ function classNames(...classes) {
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  const { user, HandleLogout } = useAuth();
+
+
+  const handleLogout = async () => {
+    try {
+      await HandleLogout()
+      alert('Logged out successfully')
+      window.location.reload();
+    } catch {
+      alert('Failed to log out')
+    }
+  }
+
   return (
     <header className="bg-white">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
@@ -49,7 +66,7 @@ export default function Header() {
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
-        <Popover.Group className="hidden lg:flex lg:gap-x-12">
+        {/* <Popover.Group className="hidden lg:flex lg:gap-x-12">
           <Popover className="relative">
             <Popover.Button className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
               Product
@@ -110,10 +127,12 @@ export default function Header() {
           <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
             Company
           </a>
-        </Popover.Group>
+        </Popover.Group> */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
-            Log in <span aria-hidden="true">&rarr;</span>
+            {user ? <button onClick={handleLogout}>Log out</button> : <Link to="/login">Log in</Link>
+}
+            <span aria-hidden="true">&rarr;</span>
           </a>
         </div>
       </nav>
@@ -140,7 +159,7 @@ export default function Header() {
           </div>
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
-              <div className="space-y-2 py-6">
+              {/* <div className="space-y-2 py-6">
                 <Disclosure as="div" className="-mx-3">
                   {({ open }) => (
                     <>
@@ -184,14 +203,17 @@ export default function Header() {
                 >
                   Company
                 </a>
-              </div>
+              </div> */}
               <div className="py-6">
                 <a
                   href="#"
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
-                  Log in
+                  {user ? <button onClick={handleLogout}>Log out</button> : <Link to="/login">Log in</Link>
+                  
+}
                 </a>
+                
               </div>
             </div>
           </div>

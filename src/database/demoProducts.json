@@ -6,7 +6,9 @@
         "link": "1",
         "price": "100",
         "image": "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg",
-        "category": "vehicles"
+        "category": "vehicles",
+        "owner": "1",
+        "status": "available"
     },
     {
         "id": "2",
@@ -14,7 +16,7 @@
             "description": "The Nomad Tumbler is the perfect travel companion for all your adventures. Whether you're commuting to work, hitting the gym, or trekking across the globe, our insulated tumbler will keep your drink at the perfect temperature. The Nomad Tumbler is available in 12oz, 16oz, and 20oz sizes and a variety of colors.",
             "link": "2",
             "price": "200",
-            "image": "https://i.ibb.co/7CQVJNm/earthen-bottle.jpg",
+            "image": "https://images.bauerhosting.com/celebrity/sites/4/2023/05/Nespresso-Nomad-Bottle-Small.jpg?auto=format&w=1440&q=80",
             "category": "Mobile"
     },
     {
@@ -23,7 +25,7 @@
             "description": "The Focus Paper Refill is designed to fit perfectly inside our Focus Journal. The refill is 100% recyclable and made from 100% recycled paper. The refill is available in lined, blank, and dot grid paper.",
             "link": "3",
             "price": "300",
-            "image": "https://i.ibb.co/7CQVJNm/earthen-bottle.jpg",
+            "image": "https://tropicskincare.com/cdn/shop/files/2022_Web-Packshot_SoftFocus-Refills_1152x1332px_1000x1000.jpg?v=1682514091",
             "category": "Babies"
     },
 
@@ -33,7 +35,7 @@
             "description": "The Focus Journal is designed to help you focus on what matters most. The journal is made with 100% recycled paper and is 100% recyclable. The Focus Journal is available in lined, blank, and dot grid paper.",
             "link": "4",
             "price": "400",
-            "image": "https://i.ibb.co/7CQVJNm/earthen-bottle.jpg",
+            "image": "https://m.media-amazon.com/images/I/911SAnHjbAL._AC_UF894,1000_QL80_.jpg",
             "category": "Health"
     },
     {
@@ -42,8 +44,10 @@
             "description": "The Machined Mechanical Pencil is precision machined from a single block of aluminum. The pencil is compatible with 0.5mm lead refills.",
             "link": "5",
             "price": "500",
-            "image": "https://i.ibb.co/7CQVJNm/earthen-bottle.jpg",
-            "category": "Health"
+            "image": "https://cdn.shopify.com/s/files/1/0625/3825/files/Wingback_mechanical_pencil_2_-_steel_2048x2048.jpg?v=1619710725",
+            "category": "Health",
+            "owner": "1",
+            "status": "available"
     },
     {
         "id": "6",
@@ -51,7 +55,7 @@
             "description": "The Machined Pen is precision machined from a single block of aluminum. The pen is compatible with any Parker ballpoint compatible refill.",
             "link": "6",
             "price": "600",
-            "image": "https://i.ibb.co/7CQVJNm/earthen-bottle.jpg",
+            "image": "https://images.squarespace-cdn.com/content/v1/5349ba13e4b095a3fb0ba65c/1556116454617-OZVGT59CR6QZHSXYF3PO/Inventery-Interchangeable-Pen-Pencil",
             "category": "Health"
     },
     {
@@ -60,8 +64,10 @@
             "description": "The Machined Pencil is precision machined from a single block of aluminum. The pencil is compatible with 0.5mm lead refills.",
             "link": "7",
             "price": "700",
-            "image": "https://i.ibb.co/7CQVJNm/earthen-bottle.jpg",
-            "category": "Health"
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSk4goJdZ7ROHgCBr4xO4sjQQ26fQpug-VNmg&usqp=CAU",
+            "category": "Health",
+            "owner": "1",
+            "status": "sold"
     }
 
 ]
