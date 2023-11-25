@@ -20,6 +20,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../context/AuthContext.js';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Spin } from 'antd';
 
 
 
@@ -30,7 +31,7 @@ export default function Hero() {
   // State for real products
   const [products, setProducts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [filteredProductsByLocation, setFilteredProductsByLocation] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   // adding user listing
@@ -45,6 +46,7 @@ export default function Hero() {
   const cancelButtonRef2 = useRef(null)
 
   // add product state
+  const [productLoading, setProductLoading] = useState(true);
   const [productLocation, setProductLocation] = useState('');
   const [productCategory, setProductCategory] = useState('');
   const [productName, setProductName] = useState('');
@@ -128,26 +130,37 @@ export default function Hero() {
     }
   };
 
-  
+  const handlefilterByLocation = (e) => {
+    const location = e.target.value;
+    const filtered = location === 'all' ? products : products.filter(product => product.location === location);
+    setSearchResults(filtered);
+  }
+
+
 
   useEffect(() => {
     const fetchProducts = async () => {
+      const filerbByStatus = where("status", "==", "available");
+
       // Creating a query against the collection, where item is not sold and ordered by date
       const queryRef = query(collection(db, "products"), orderBy("createdAt", "desc"));
-      
+
       const querySnapshot = await getDocs(queryRef);
       const productList = [];
       querySnapshot.forEach((doc) => {
         productList.push({ id: doc.id, ...doc.data() });
       });
-      
+
+
+
       setProducts(productList);
       setSearchResults(productList);
+      setProductLoading(false);
     };
-  
+
     fetchProducts();
   }, []);
-  
+
 
   useEffect(() => {
     let filtered = products;
@@ -175,7 +188,7 @@ export default function Hero() {
   const handleImageUpload = async (e) => {
     const files = e.target.files;
     const uploadedImageUrls = [];
-  
+
     for (const file of files) {
       const uniqueId = Date.now();
       const storageRef = ref(storage, `products/${uniqueId}/${file.name}`);
@@ -187,11 +200,11 @@ export default function Hero() {
         console.error("Error uploading file:", error);
       }
     }
-  
+
     setProductImages([...productImages, ...uploadedImageUrls]);
   };
-  
-  
+
+
 
 
 
@@ -203,6 +216,20 @@ export default function Hero() {
         <div className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center md:justify-start md:space-x-10">
 
+          <select
+              onChange={handlefilterByLocation}
+              className="bg-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent rounded-lg pr-8 py-2 max-w-xs border-2 border-green-500"
+            >
+              <option value="all">All Locations</option>
+              <option value="Awdal">Awdal</option>
+              <option value="Maroodi Jeex">Maroodi Jeex</option>
+              <option value="Sahil">Sahil</option>
+              <option value="Togdheer">Togdheer</option>
+              <option value="Sool">Sool</option>
+              <option value="Sanaag">Sanaag</option>
+              <option value="Other">Other</option>
+            </select>
+            
             <select
               onChange={handleCategoryChange}
               className="bg-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent rounded-lg px-4 py-2 max-w-xs border-2 border-green-500"
@@ -221,11 +248,14 @@ export default function Hero() {
 
             </select>
 
+            
+            
+
             <input
               type="text"
               placeholder="Search"
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent rounded-lg m-3 px-4 py-2 w-full border-2 border-green-500" />
+              className="bg-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent rounded-lg my-3 px-4 py-2 w-full border-2 border-green-500" />
           </div>
         </div>
       </div>
@@ -239,7 +269,7 @@ export default function Hero() {
           <div className="flex  max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-x-4 justify-between  ">
 
             <button
-               onClick={toggleMyListings}
+              onClick={toggleMyListings}
               className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded border-2 border-green-500 w-44">
               {viewingMyListings ? "Public Listings" : "My Listings"}
             </button>
@@ -548,7 +578,7 @@ export default function Hero() {
             </div>
           </Dialog>
         </Transition.Root>
-
+        {/* Login Modal */}
         <Transition.Root show={loginNotif} as={Fragment}>
           <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={() => setLoginNotif(false)}>
             <Transition.Child
@@ -627,66 +657,80 @@ export default function Hero() {
 
         {/* Products List Section */}
 
-        <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-10 lg:max-w-7xl lg:px-8">
+        {productLoading ? (
+          <div role="status">
+          <svg aria-hidden="true" class="absolute top-1/2 left-1/2 w-16 h-16 text-gray-200 animate-spin  fill-green-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
+          </svg>
+          <span class="sr-only">Loading...</span>
+        </div>
+        ) : (
+          <>
+            <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-10 lg:max-w-7xl lg:px-8">
 
-          {/* <h2 className="text-2xl tracking-tight text-gray-900">Products </h2> */}
-
-
-          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-
-            {searchResults?.map((product) => (
-              <a key={product.id}
-                href={`/productDetails/${product.id}`}
-                className="group">
-                <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-                  <img
-                    src={product.image}
-                    alt={product.imageAlt}
-                    className="h-full w-full object-cover object-center group-hover:opacity-75"
-                  />
-                </div>
+              {/* <h2 className="text-2xl tracking-tight text-gray-900">Products </h2> */}
 
 
-                {product?.status === 'sold' ? (
-                  <>
-                    <div className="flex justify-between items-center">
+              <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
 
-                      <p className="mt-4 text-sm font-medium text-gray-900">$ {product.price}</p>
-                      <p className="mt-4 text-sm font-medium text-gray-900">Sold</p>
+                {searchResults?.map((product) => (
+                  <a key={product.id}
+                    href={`/productDetails/${product.id}`}
+                    className="group">
+                    <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                      <img
+                        src={product.image}
+                        alt={product.imageAlt}
+                        className="h-full w-full object-cover object-center group-hover:opacity-75"
+                      />
                     </div>
-                    <h3 className="mt-1 text-lg text-gray-700 hover:underline text-decoration-line: line-through line-through-color: red line-through-mode: continuous line-through-source: ">
-                      {product.name}
-                    </h3>
-                  </>
-                ) : (
-                  <>
-                    <p className="mt-4 text-sm font-medium text-gray-900">$ {product.price}</p>
-
-                    <h3 className="mt-1 text-lg font-medium text-gray-900 hover:underline">
-                      {product.name}
-                    </h3>
-                  </>
-                )}
 
 
+                    {product?.status === 'sold' ? (
+                      <>
+                        <div className="flex justify-between items-center">
+
+                          <p className="mt-4 text-sm font-medium text-gray-900">$ {product.price}</p>
+                          <p className="mt-4 text-sm font-medium text-gray-900">Sold</p>
+                        </div>
+                        <h3 className="mt-1 text-lg text-gray-700 hover:underline text-decoration-line: line-through line-through-color: red line-through-mode: continuous line-through-source: ">
+                          {product.name}
+                        </h3>
+                      </>
+                    ) : (
+                      <>
+                        <p className="mt-4 text-sm font-medium text-gray-900">$ {product.price}</p>
+
+                        <h3 className="mt-1 text-lg font-medium text-gray-900 hover:underline">
+                          {product.name}
+                        </h3>
+                      </>
+                    )}
 
 
-                <div className="flex space-x-4 mt-4">
-                  <button className="bg-green-500 hover:bg-green-700 text-white w-full py-2 px-4 rounded">
-                    Contact Seller
-                  </button>
-                </div>
-              </a>
 
-            ))}
 
-          </div>
+                    <div className="flex space-x-4 mt-4">
+                      <button className="bg-green-500 hover:bg-green-700 text-white w-full py-2 px-4 rounded">
+                        Contact Seller
+                      </button>
+                    </div>
+                  </a>
 
+                ))}
+
+              </div>
+
+            </div>
+            <div className="text-center text-2xl text-gray-500 ">
+              <p>{searchResults.length} products found</p>
+            </div>
+          </>
+        
+
+        )}
         </div>
-        <div className="text-center text-2xl text-gray-500 ">
-          <p>{searchResults.length} products found</p>
-        </div>
-      </div>
 
     </div>
   )
