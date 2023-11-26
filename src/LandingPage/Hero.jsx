@@ -214,8 +214,8 @@ export default function Hero() {
       <div className="bg-white">
         {/* Search Section */}
         <div className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center md:justify-start md:space-x-10">
-
+          
+        <div className="flex max-w-7xl mx-auto   lg:px-0 space-x-4 justify-between  ">
           <select
               onChange={handlefilterByLocation}
               className="bg-white focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent rounded-lg pr-8 py-2 max-w-xs border-2 border-green-500"
@@ -247,6 +247,8 @@ export default function Hero() {
               <option value="Jobs">Jobs</option>
 
             </select>
+          </div>
+            <div className="flex justify-between items-center md:justify-start md:space-x-10">
 
             
             

@@ -161,7 +161,7 @@ const Signup = () => {
 
 
 
-                                    {/* Generate About Section with full length text area */}
+                                   
                                     <div className="col-span-6">
                                         <label htmlFor="about" className="block text-sm font-medium text-gray-700 darks:text-gray-100">
                                             About
@@ -182,7 +182,7 @@ const Signup = () => {
 
 
 
-                                    {/* Generate Cover Photo Section with full length  */}
+                                    
                                     <div className="col-span-6">
                                         <label htmlFor="cover-photo" className="block text-sm font-medium text-gray-700 darks:text-gray-100">
                                             Cover Photo
